@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="/js/reto.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>El reto</h1>
+
+        <div th:each="palabra:${lista}">
+            <h2 th:text="${palabra.ini3}"></h2>
+        </div>
+
+        <h3 id="definicion" th:text="${desordenada[0].definicion}"></h3>
+    </div>
+    <script>
+        fetchData();
+    </script>
+</body>
+</html>
