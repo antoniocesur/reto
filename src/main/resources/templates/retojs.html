@@ -60,6 +60,11 @@
             element.innerHTML=val[partida[pos]].definicion;
             document.getElementById('contenedor').appendChild(element);
 
+            //Leo la primera definición
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = listaPalabras[partida[pos]].definicion;
+            window.speechSynthesis.speak(msg);
+
             //Pongo los segundos en 50
             document.getElementById("segundos").innerHTML=50;
 
@@ -67,18 +72,25 @@
         }
 
         function ponerDefinicion(){
-            pos = (pos<5) ? pos+1 : 0;
+            do{
+                pos = (pos<5) ? pos+1 : 0;
+            }while(listaPalabras[partida[pos]].resuelta);
             //Pongo la nueva definición
             let element = document.getElementById("definicion");
             element.innerHTML=listaPalabras[partida[pos]].definicion;
             //Borro la solución
             document.getElementById("solucion").innerHTML="";
+
+            let msg = new SpeechSynthesisUtterance();
+            msg.text = listaPalabras[partida[pos]].definicion;
+            window.speechSynthesis.speak(msg);
         }
 
         function ponerSolucion(){
             document.getElementById("solucion").innerHTML=listaPalabras[partida[pos]].palabra;
             let element=document.getElementById(listaPalabras[partida[pos]].palabra);
             element.style.textDecoration="line-through";
+            listaPalabras[partida[pos]].resuelta=true;
             //element.innerHTML="";
         }
 
