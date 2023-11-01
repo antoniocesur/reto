@@ -26,6 +26,7 @@
         document.getElementById("btnNueva").onclick=()=>window.location.reload();
         var listaPalabras;
         var partida=aleatorios(6,6);
+        var msg = new SpeechSynthesisUtterance();
         setInterval(() => document.getElementById("segundos").innerHTML--, 1000);
 
         function fetchData() {
@@ -57,12 +58,11 @@
             //Pongo la primera definición
             let element = document.createElement("h3");
             element.id="definicion";
-            element.innerHTML=val[partida[pos]].definicion;
+            //element.innerHTML=val[partida[pos]].definicion;
             document.getElementById('contenedor').appendChild(element);
 
-            //Leo la primera definición
-            let msg = new SpeechSynthesisUtterance();
-            msg.text = listaPalabras[partida[pos]].definicion;
+            let frase=listaPalabras[partida[pos]].definicion.split(".")[0]; //Me quedo solo con la primera definición
+            msg.text = frase;
             window.speechSynthesis.speak(msg);
 
             //Pongo los segundos en 50
@@ -77,12 +77,13 @@
             }while(listaPalabras[partida[pos]].resuelta);
             //Pongo la nueva definición
             let element = document.getElementById("definicion");
-            element.innerHTML=listaPalabras[partida[pos]].definicion;
+            //element.innerHTML=listaPalabras[partida[pos]].definicion;
             //Borro la solución
             document.getElementById("solucion").innerHTML="";
 
-            let msg = new SpeechSynthesisUtterance();
-            msg.text = listaPalabras[partida[pos]].definicion;
+            speechSynthesis.cancel();
+            let frase=listaPalabras[partida[pos]].definicion.split(".")[0];
+            msg.text = frase;
             window.speechSynthesis.speak(msg);
         }
 
