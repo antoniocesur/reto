@@ -21,6 +21,7 @@
 
 <script>
         var pos=0; //Es la posición de la palabra que toca adivinar para que sea aleatoria
+        var resueltas=0; //El número de palabras ya acertadas
         document.getElementById("siguiente").onclick=ponerDefinicion;
         document.getElementById("btnSolucion").onclick=ponerSolucion;
         document.getElementById("btnNueva").onclick=()=>window.location.reload();
@@ -72,19 +73,23 @@
         }
 
         function ponerDefinicion(){
-            do{
-                pos = (pos<5) ? pos+1 : 0;
-            }while(listaPalabras[partida[pos]].resuelta);
-            //Pongo la nueva definición
-            let element = document.getElementById("definicion");
-            //element.innerHTML=listaPalabras[partida[pos]].definicion;
-            //Borro la solución
-            document.getElementById("solucion").innerHTML="";
+            if(resueltas>5){
+                window.location.reload();
+            }else{
+                do{
+                    pos = (pos<5) ? pos+1 : 0;
+                }while(listaPalabras[partida[pos]].resuelta);
+                //Pongo la nueva definición
+                let element = document.getElementById("definicion");
+                //element.innerHTML=listaPalabras[partida[pos]].definicion;
+                //Borro la solución
+                document.getElementById("solucion").innerHTML="";
 
-            speechSynthesis.cancel();
-            let frase=listaPalabras[partida[pos]].definicion.split(".")[0];
-            msg.text = frase;
-            window.speechSynthesis.speak(msg);
+                speechSynthesis.cancel();
+                let frase=listaPalabras[partida[pos]].definicion.split(".")[0];
+                msg.text = frase;
+                window.speechSynthesis.speak(msg);
+            }
         }
 
         function ponerSolucion(){
@@ -92,6 +97,7 @@
             let element=document.getElementById(listaPalabras[partida[pos]].palabra);
             element.style.textDecoration="line-through";
             listaPalabras[partida[pos]].resuelta=true;
+            resueltas++;
             //element.innerHTML="";
         }
 
