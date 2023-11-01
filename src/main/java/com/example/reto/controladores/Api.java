@@ -6,10 +6,7 @@ import com.example.reto.modelo.Palabra;
 import com.example.reto.repositorios.RepositorioPalabras;
 import com.example.reto.servicios.ServicioPalabras;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +16,7 @@ public class Api {
     @Autowired
     RepositorioPalabras repositorioPalabras;
 
+    @CrossOrigin(origins = "http://localhost")
     @GetMapping(value="/lista6")
     public @ResponseBody List<PalabraDTO> lista6Palabras() {
         //Recupero una lista de 6 palabras aleatorias
