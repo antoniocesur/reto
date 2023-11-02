@@ -13,4 +13,7 @@ public interface RepositorioPalabras extends JpaRepository<Palabra, Long> {
     //SELECT palabra p, definicion FROM diccionario where longitud>4 ORDER BY RAND() LIMIT 6
     @Query(value = "SELECT * FROM diccionario where longitud>4 ORDER BY RAND() LIMIT 6", nativeQuery = true)
     public ArrayList<Palabra> find6();
+
+    @Query(value = "SELECT * FROM diccionario where longitud>4 ORDER BY RAND() LIMIT 7", nativeQuery = true)
+    public ArrayList<Palabra> find7();
 }
