@@ -26,12 +26,12 @@
         document.getElementById("btnSolucion").onclick=ponerSolucion;
         document.getElementById("btnNueva").onclick=()=>window.location.reload();
         var listaPalabras;
-        var partida=aleatorios(6,6);
+        var partida; //VA a guardar los números de orden en el que aparecen las palabras
         var msg = new SpeechSynthesisUtterance();
         setInterval(() => document.getElementById("segundos").innerHTML--, 1000);
 
         function fetchData() {
-          fetch("http://localhost:8000/lista6",
+          fetch("http://localhost:8000/lista7",
             {
                 method: 'GET',
                 headers: new Headers({ 'Content-type': 'application/json'}),
@@ -51,6 +51,7 @@
                 document.getElementById('contenedor').appendChild(element);
             }
             listaPalabras=val; //Guardo la referencia en una variable global
+            partida=aleatorios(listaPalabras.length,listaPalabras.length);
 
             /*//Versión desordenada de la lista
             const desordenada=structuredClone(val);
@@ -73,11 +74,11 @@
         }
 
         function ponerDefinicion(){
-            if(resueltas>5){
+            if(resueltas>listaPalabras.length-1){
                 window.location.reload();
             }else{
                 do{
-                    pos = (pos<5) ? pos+1 : 0;
+                    pos = (pos<listaPalabras.length-1) ? pos+1 : 0;
                 }while(listaPalabras[partida[pos]].resuelta);
                 //Pongo la nueva definición
                 let element = document.getElementById("definicion");
