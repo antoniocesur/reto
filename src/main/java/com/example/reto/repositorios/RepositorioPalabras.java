@@ -16,4 +16,6 @@ public interface RepositorioPalabras extends JpaRepository<Palabra, Long> {
 
     @Query(value = "SELECT * FROM diccionario where longitud>4 ORDER BY RAND() LIMIT 7", nativeQuery = true)
     public ArrayList<Palabra> find7();
+
+    public ArrayList<Palabra> findByPalabraStartsWith(String inicio);
 }

@@ -25,10 +25,12 @@ public class Api {
     RepositorioPartidas repositorioPartidas;
     @Autowired
     RepositorioPalabrasPartida repositorioPalabrasPartida;
+    @Autowired
+    ServicioPalabras servicioPalabras;
 
     @CrossOrigin(origins = "http://localhost")
     @GetMapping(value="/lista7")
-    public @ResponseBody List<PalabraDTO> lista6Palabras() {
+    public @ResponseBody List<PalabraDTO> lista7Palabras() {
         //Recupero una lista de 6 palabras aleatorias
         ArrayList<Palabra> lista=repositorioPalabras.find7();
 
@@ -36,7 +38,9 @@ public class Api {
         PalabraMapper palabraMapper=new PalabraMapper();
         ArrayList<PalabraDTO> listaDTO=new ArrayList<>();
         for(Palabra p:lista){
-            listaDTO.add(palabraMapper.mapPalabra(p));
+            PalabraDTO aux=palabraMapper.mapPalabra(p);
+            aux.setSimilares(servicioPalabras.encuentraSimilares(p));
+            listaDTO.add(aux);
         }
 
         Partida partida=new Partida();
@@ -53,4 +57,31 @@ public class Api {
 
         return listaDTO;
     }
+
+    @CrossOrigin(origins = "http://localhost")
+    @GetMapping(value="/listausada")
+    public @ResponseBody List<PalabraDTO> listaPalabrasYaUsadas() {
+
+        //Consigo una partida aleatoria
+        Partida partida=repositorioPartidas.find1();
+
+        //Consigo la lista de palabras de esa partida
+        ArrayList<PalabrasPartida> listaPP=repositorioPalabrasPartida.findByPartida(partida);
+
+        //Paso las palabras de esa partida a una lista de palabras
+        ArrayList<Palabra> listaP=new ArrayList<>();
+        for(PalabrasPartida pp:listaPP){
+            listaP.add(pp.getPalabra());
+        }
+
+        //Convierto la lista de palabras en un DTO
+        PalabraMapper palabraMapper=new PalabraMapper();
+        ArrayList<PalabraDTO> listaDTO=new ArrayList<>();
+        for(Palabra p:listaP){
+            listaDTO.add(palabraMapper.mapPalabra(p));
+        }
+
+        return listaDTO;
+    }
+
 }
