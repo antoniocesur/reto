@@ -14,24 +14,37 @@
 </div>
 <div class="container" id="botones">
     <button class="btn btn-primary" id="siguiente">Siguiente</button>
-    <button class="btn btn-primary" id="btnNueva">Nueva partida</button>
     <button class="btn btn-danger" id="btnSolucion">Ver solución</button>
     <span id="segundos"></span>
 </div>
+<div class="container mt-5">
+    <button class="btn btn-warning" id="btnPistas">Pistas</button>
+    <p id="pistas" style="display: none;">Pistas:</p>
+</div>
+<div class="container mt-5">
+    <button class="btn btn-success" id="btnNueva">Nueva partida</button>
+</div>
 
 <script>
+        //Según el parámetro que me pasen pido en la API palabras nuevas o ya usadas
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        var url = urlParams.get('tipo')==1 ? "http://localhost:8000/listausada" : "http://localhost:8000/lista7";
+
         var pos=0; //Es la posición de la palabra que toca adivinar para que sea aleatoria
         var resueltas=0; //El número de palabras ya acertadas
         document.getElementById("siguiente").onclick=ponerDefinicion;
         document.getElementById("btnSolucion").onclick=ponerSolucion;
         document.getElementById("btnNueva").onclick=()=>window.location.reload();
+        document.getElementById("btnPistas").onclick=mostrarPistas;
         var listaPalabras;
         var partida; //VA a guardar los números de orden en el que aparecen las palabras
         var msg = new SpeechSynthesisUtterance();
         setInterval(() => document.getElementById("segundos").innerHTML--, 1000);
 
         function fetchData() {
-          fetch("http://localhost:8000/lista7",
+
+          fetch(url,
             {
                 method: 'GET',
                 headers: new Headers({ 'Content-type': 'application/json'}),
@@ -70,6 +83,8 @@
             //Pongo los segundos en 50
             document.getElementById("segundos").innerHTML=50;
 
+            document.getElementById("pistas").innerHTML=listaPalabras[partida[pos]].similares;
+
             return console.log(val);
         }
 
@@ -90,6 +105,8 @@
                 let frase=listaPalabras[partida[pos]].definicion.split(".")[0];
                 msg.text = frase;
                 window.speechSynthesis.speak(msg);
+
+                document.getElementById("pistas").innerHTML=listaPalabras[partida[pos]].similares;
             }
         }
 
@@ -100,6 +117,13 @@
             listaPalabras[partida[pos]].resuelta=true;
             resueltas++;
             //element.innerHTML="";
+        }
+
+        //Muestra / oculta las pistas que son palabras que empiezan por las mismas 3 letras
+        function mostrarPistas(){
+            console.log("Cambio")
+            let valor = (document.getElementById('pistas').style.display=="none") ? "inline" : "none";
+            document.getElementById('pistas').style.display = valor;
         }
 
         function aleatorios(cantidad, maxValor){
