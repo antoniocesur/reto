@@ -12,8 +12,11 @@ public class Palabra {
     @Column(name = "id", nullable = false)
     private long id;
 
-    private String palabra;
+    private String lema;
     private String definicion;
+    private String definiciones;
+    private int frecuencia;
+    private double normalizada;
     private int longitud;
 
 }

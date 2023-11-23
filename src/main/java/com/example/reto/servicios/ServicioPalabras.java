@@ -13,8 +13,8 @@ public class ServicioPalabras {
 
     public String encuentraSimilares(Palabra palabra) {
         String similares = "";
-        for(Palabra p: repositorioPalabras.findByPalabraStartsWith(palabra.getPalabra().substring(0,3))){
-            similares += p.getPalabra() + ", ";
+        for(Palabra p: repositorioPalabras.findByLemaStartsWith(palabra.getLema().substring(0,3))){
+            similares += p.getLema() + ", ";
         }
         return similares;
     }

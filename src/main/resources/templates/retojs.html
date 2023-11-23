@@ -6,30 +6,33 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 <body>
-<div class="container" id="contenedor">
+    <div class="container" id="contenedor">
 
-</div>
-<div class="container">
-    <h3 class="text-danger" id="solucion"></h3>
-</div>
-<div class="container" id="botones">
-    <button class="btn btn-primary" id="siguiente">Siguiente</button>
-    <button class="btn btn-danger" id="btnSolucion">Ver solución</button>
-    <span id="segundos"></span>
-</div>
-<div class="container mt-5">
-    <button class="btn btn-warning" id="btnPistas">Pistas</button>
-    <p id="pistas" style="display: none;">Pistas:</p>
-</div>
-<div class="container mt-5">
-    <button class="btn btn-success" id="btnNueva">Nueva partida</button>
-</div>
+    </div>
+    <div class="container">
+        <h3 class="text-danger" id="solucion"></h3>
+    </div>
+    <div class="container" id="botones">
+        <button class="btn btn-primary" id="siguiente">Siguiente</button>        
+        <button class="btn btn-danger" id="btnSolucion">Ver solución</button>        
+        <span id="segundos">50</span>
+        <h3 id="definicion" class="text-secondary"></h3>
+    </div>
+    <div class="container mt-5">
+        <button class="btn btn-warning" id="btnPistas">Pistas</button>
+        <p id="pistas" style="display: none;">Pistas:</p>
+    </div>
+    <div class="container mt-5">
+        <button class="btn btn-success" id="btnNueva">Nueva partida</button>
+    </div>
+    <div class="container mt-5">        
+    </div>
 
-<script>
+    <script>
         //Según el parámetro que me pasen pido en la API palabras nuevas o ya usadas
         const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        var url = urlParams.get('tipo')==1 ? "http://localhost:8000/listausada" : "http://localhost:8000/lista7";
+        const urlParams = new URLSearchParams(queryString);        
+        var url = urlParams.get('tipo')==1 ? "http://localhost:8500/listausada" : "http://localhost:8500/lista7";
 
         var pos=0; //Es la posición de la palabra que toca adivinar para que sea aleatoria
         var resueltas=0; //El número de palabras ya acertadas
@@ -42,49 +45,46 @@
         var msg = new SpeechSynthesisUtterance();
         setInterval(() => document.getElementById("segundos").innerHTML--, 1000);
 
-        function fetchData() {
-
+        function fetchData() {            
+          
           fetch(url,
-            {
+            { 
                 method: 'GET',
                 headers: new Headers({ 'Content-type': 'application/json'}),
-                mode: 'cors',
+                mode: 'cors', 
                 cache: 'default'
             })
             .then((response) => response.json())
             .then((json) => takeData(json));
         }
 
-        function takeData(val) {
+        function takeData(val) {                        
             //Pongo las 3 primeras letras de las 6 palabras
             for(let p in val){
                 let element = document.createElement("h2");
-                element.innerHTML=val[p].ini3;
+                element.innerHTML=val[p].ini3.toUpperCase();
                 element.id=val[p].palabra;
                 document.getElementById('contenedor').appendChild(element);
             }
             listaPalabras=val; //Guardo la referencia en una variable global
             partida=aleatorios(listaPalabras.length,listaPalabras.length);
 
-            /*//Versión desordenada de la lista
-            const desordenada=structuredClone(val);
-            desordenada.sort(randomize);*/
-
-            //Pongo la primera definición
-            let element = document.createElement("h3");
-            element.id="definicion";
-            //element.innerHTML=val[partida[pos]].definicion;
             document.getElementById('contenedor').appendChild(element);
+            
+            let frase=recortarDefinicion(listaPalabras[partida[pos]].definicion);  
+            console.log("frase: " + frase);          
 
-            let frase=listaPalabras[partida[pos]].definicion.split(".")[0]; //Me quedo solo con la primera definición
-            msg.text = frase;
+            msg.text = frase;            
             window.speechSynthesis.speak(msg);
+
+            //Pongo la solución en el párrafo de definicion
+            document.getElementById("definicion").innerHTML=recortarDefinicion(listaPalabras[partida[pos]].definicion);
 
             //Pongo los segundos en 50
             document.getElementById("segundos").innerHTML=50;
 
             document.getElementById("pistas").innerHTML=listaPalabras[partida[pos]].similares;
-
+            
             return console.log(val);
         }
 
@@ -97,14 +97,21 @@
                 }while(listaPalabras[partida[pos]].resuelta);
                 //Pongo la nueva definición
                 let element = document.getElementById("definicion");
-                //element.innerHTML=listaPalabras[partida[pos]].definicion;
+                element.innerHTML=listaPalabras[partida[pos]].definicion;            
                 //Borro la solución
                 document.getElementById("solucion").innerHTML="";
 
                 speechSynthesis.cancel();
-                let frase=listaPalabras[partida[pos]].definicion.split(".")[0];
+                
+                //Corto por los puntos y después los reuno si tienen una longitud de más de 4, para quitar adj y similares                
+                let frase=recortarDefinicion(listaPalabras[partida[pos]].definicion);   
+                console.log("frase: " + frase);             
+
                 msg.text = frase;
                 window.speechSynthesis.speak(msg);
+
+                //Pongo la solución en el párrafo de definicion
+                document.getElementById("definicion").innerHTML=recortarDefinicion(listaPalabras[partida[pos]].definicion);
 
                 document.getElementById("pistas").innerHTML=listaPalabras[partida[pos]].similares;
             }
@@ -119,8 +126,24 @@
             //element.innerHTML="";
         }
 
+        //Recorta la definición para quitar números, abreviaciones y ejemplos.
+        function recortarDefinicion(completa){
+            let frases=completa.split(".");            
+            let frase="";
+            let encontrado = false;            
+            for(f in frases){
+                if(!encontrado && frases[f].length>7){
+                    frase = frases[f];
+                    encontrado=true;
+                }
+            }
+            console.log(frases);
+            console.log(frase);
+            return frase;
+        }
+
         //Muestra / oculta las pistas que son palabras que empiezan por las mismas 3 letras
-        function mostrarPistas(){
+        function mostrarPistas(){ 
             console.log("Cambio")
             let valor = (document.getElementById('pistas').style.display=="none") ? "inline" : "none";
             document.getElementById('pistas').style.display = valor;
@@ -137,7 +160,7 @@
                         if(nums[m]==aux)
                             repetido=true;
                     }
-                }while(repetido);
+                }while(repetido);        
                 nums[n]=aux
             }
             return nums;
@@ -150,6 +173,6 @@
         fetchData();
     </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

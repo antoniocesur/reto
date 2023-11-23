@@ -16,10 +16,10 @@ public class PalabraMapper {
         }*/
 
         return PalabraDTO.builder()
-                .palabra(palabra.getPalabra())
+                .palabra(palabra.getLema())
                 .definicion(palabra.getDefinicion())
                 .longitud(palabra.getLongitud())
-                .ini3(palabra.getPalabra().substring(0,3))
+                .ini3(palabra.getLema().substring(0,3))
                 .similares("")
                 .build();
     }
